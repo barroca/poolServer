@@ -5,7 +5,7 @@
 <title>
 Votação do BBB
 </title>
-<link href="sitecss.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="./static/sitecss.css" rel="stylesheet" type="text/css" media="screen" />
 </head>
 
 <body>
@@ -36,24 +36,39 @@ Para eliminar o <b> Particiapante 2</b> pelo telefone disque <b>0800-123-002</b>
 
 	</div>
 <div id="foot">
-<form id="form3" action="vote" method="post" onsubmit="return checkform(this);">
-    <p>
-      <label for="code">Escreva o código <span id="txtCaptchaDiv" style="color:#F00"></span> abaixo
-<!-- this is where the script will place the generated code --> 
-      <input type="hidden" id="txtCaptcha" name="txtCaptcha" /></label><!-- this is where the script will place a copy of the code for validation: this is a hidden field -->
-</p>
+<form id="form3" action="/" method="post" onsubmit="return checkform(this);">
+ 
+	<input type="hidden" name="vote" value="0">
 <p>
-      <input type="text" name="txtInput" id="txtInput" size="30" />
-    </p>
+<script>
+var RecaptchaOptions = {
+   lang: pt
+};
+</script>
+    <script type="text/javascript"
+       src="http://www.google.com/recaptcha/api/challenge?k=6LdOVtgSAAAAAG6ou3vioD8BwSHU-6D516RfYfGV">
+    </script>
+    <noscript>
+       <iframe src="http://www.google.com/recaptcha/api/noscript?k=6LdOVtgSAAAAAG6ou3vioD8BwSHU-6D516RfYfGV"
+           height="300" width="500" frameborder="0"></iframe><br>
+       <textarea name="recaptcha_challenge_field" rows="3" cols="40">
+       </textarea>
+       <input type="hidden" name="recaptcha_response_field"
+           value="manual_challenge">
+
+    </noscript>
+</p>
   <p class="submit">
-<button class="shiny-blue">Envie seu voto agora</button>
+{{ failMessage }}
+<button class="shiny-blue" />Envie seu voto agora</button>
+
   </p>
 </form>
 </div>
 
 </div>
 
-<script type="text/javascript" src="js/script.js"></script>
+<script type="text/javascript" src="./static/js/script.js"></script>
 </body>
 
 </html>

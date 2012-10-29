@@ -7,9 +7,20 @@ body {
 
 #content{
 	width:620px;
-	height:580px;
+	height:690px;
 	background-color:#ffffff;
- margin: 100px auto auto auto;
+ margin: 50px auto auto auto;
+vertical-align:middle;
+border: 5px solid black;
+border-color:#dddddd;
+border-radius: 4px;
+
+}
+#content1{
+	width:620px;
+	height:374px;
+	background-color:#ffffff;
+ margin: 50px auto auto auto;
 vertical-align:middle;
 border: 5px solid black;
 border-color:#dddddd;
@@ -37,6 +48,16 @@ h1{
     	margin-right: auto;
 }
 
+h2{
+	font-size:140%;
+	font-weight:normal;
+   	margin-left: auto;
+    	margin-right: auto;
+	float:middle;
+text-align:center;
+}
+
+
 #top{
 text-align:center;
 float:middle;
@@ -51,7 +72,7 @@ display: block;
 width: 40px;
 height: 40px;
 background-image:url(./images/sprite.png);
-margin-left:100px;
+margin-left:60px;
 float:left;
 }
 
@@ -80,13 +101,13 @@ vertical-align:center;
 #choices .right{
  float:right;
  width: 250px;
-margin: 20px;
+margin: 30px;
 }
 
 #choices .left{
  float:left;
  width: 250px;
-margin: 20px;
+margin: 30px;
 }
 
 .part1
@@ -122,9 +143,42 @@ border-color:#ffa500;
 border-color:#ffa500;
 }
 
+
+#choices .right1{
+ float:right;
+ width: 220px;
+}
+
+#choices .left1{
+ float:left;
+ width: 220px;
+}
+
+.part1a
+{
+display: block;
+width: 220px;
+height: 240px;
+background-position: -55px -180px;
+background-image:url(./images/sprite.png);
+float:center;
+
+}
+.part2a
+{
+display: block;
+width: 220px;
+height: 240px;
+background-position: -380px -180px;
+background-image:url(./images/sprite.png);
+float:center;
+
+}
+
+
 #foot{
 text-align:center;
-height: 142px;
+height: 186px;
    	margin-left: auto;
     	margin-right: auto;
 background-color:#eeeeee;
@@ -139,8 +193,15 @@ padding:10px;
 }
 
 
-
-
+.canvas{
+margin-top: 77px;
+float: middle;
+padding-left: 0;
+padding-right: 0;
+margin-left: 195px;
+display: block;
+position: absolute;
+}
 
 button.shiny-blue {
   background-color: #759ae9;
@@ -161,7 +222,7 @@ button.shiny-blue {
   font: bold 13px/1 "helvetica neue", helvetica, arial, sans-serif;
   padding: 10px 0;
   text-shadow: 0 -1px 1px #1a5ad9;
-  width: 150px; 
+  width: 150px;
 }
   button.shiny-blue:hover {
     background-color: #5d89e8;

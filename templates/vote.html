@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+Votação do BBB
+</title>
+<link href="./static/sitecss.css" rel="stylesheet" type="text/css" media="screen" />
+</head>
+
+<body>
+<script type="text/javascript" src="./static/js/script.js"></script>
+
+
+<div id="content1">
+<span class="closeicon"></span>
+	<div id="top">
+<p>
+<span class="myicon">
+</span>
+<h1>QUEM DEVE SER O <b>ELIMINADO</b>?</h1>
+
+</p>
+
+
+	</div>
+	<div id="bar">
+	</div>
+	<div id="choices">
+	<p> <h2> <b>Parabéns!</b> Seu voto para o <b>Participante {{ v }}</b> foi enviado com sucesso.</h2></p>
+		<p class="left1" ><span class="part1a" id="foto1"></span></p>
+		<p class="right1" ><span class="part2a" id="foto2" ></span> </p>
+	<p class="canvas"><canvas id="mycanvas" width="242" height="176">
+</canvas>
+<script type="text/javascript">
+//this function rotate text along circle stating at startRotation within an angle 
+CanvasRenderingContext2D.prototype.fillTextCircle = function(text,x,y,radius,startRotation,angle){
+   var numRadsPerLetter = angle/ text.length;
+   this.save();
+   this.translate(x,y);
+   this.rotate(startRotation);
+
+   for(var i=0;i<text.length;i++){
+      this.save();
+      this.rotate(i*numRadsPerLetter);
+
+      this.fillText(text[i],0,-radius);
+      this.restore();
+   }
+   this.restore();
+}
+
+var canvas = document.getElementById('mycanvas');
+var ctx = canvas.getContext('2d');
+//draw orange arc using v1 variable as size of arc starting at 0.75 pi
+ctx.beginPath();
+ctx.arc(120, 120, 100, 0.75 * Math.PI, (0.75 + ({{ v1 }}/100 * 1.5)) * Math.PI, false);
+ctx.strokeStyle = "rgb(255, 165, 0)";
+ctx.lineWidth = 40;
+ctx.stroke();
+
+//draw gray arc using v1 variable as start position, end on 2.25 pi
+ctx.beginPath();
+ctx.arc(120, 120, 100,  (0.75 + ({{ v1 +0.5}}/100 * 1.5)) * Math.PI, 2.25 * Math.PI, false);
+ctx.strokeStyle = "rgb(211, 211, 211)";
+ctx.lineWidth = 40;
+ctx.stroke();
+
+//Write text along arc
+ctx.font = "30px Trebuchet MS";
+ctx.fillStyle='white'; 
+//add shadow
+ctx.shadowColor = "black"; 
+ctx.shadowOffsetX = 1; 
+ctx.shadowOffsetY = 1; 
+ctx.shadowBlur = 5;
+//position of encounter of orange and gray arcs
+var off = (1.25*Math.PI) +( ({{ v1 }}/100 * 1.5) * Math.PI) ;
+
+//start 0.17 pi before off, this is the orange percentage
+ctx.fillTextCircle("{{v1}}%",120,120,90,off - (0.17*Math.PI) ,0.15*Math.PI);
+//start 0.02 pi after off, this is the gray percentage
+ctx.fillTextCircle("{{v2}}%",120,120,90,off+ (0.02*Math.PI) ,0.15*Math.PI);
+  
+
+</script>
+</p>
+
+
+
+	</div>
+
+</div>
+
+	
+</body>
+
+</html>
+
+
