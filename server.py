@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import time 
+import datetime
+
 import tornado.httpserver
 import tornado.ioloop
 import tornado.options
@@ -11,7 +13,6 @@ from recaptcha.client import captcha
 from tornado.options import define, options
 define("port", default=8888, help="run on the given port", type=int)
 define("duration", default=100000, help="run server for period of seconds", type=int)
-tornado.options.parse_command_line()
 '''
 Public key: 6LdOVtgSAAAAAG6ou3vioD8BwSHU-6D516RfYfGV
 Private key: 6LdOVtgSAAAAAGqL3bP8X75Nk809MJiARDht8HPP 
@@ -84,11 +85,13 @@ the page javascript check if the user fill all the values
 handlers=[ (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': './static'}),
             (r'/', IndexHandler) ]
 myVotes = Votes()
-startTime = time.localtime()
-print options.duration 
+startTime = time.time()
+
 if __name__ == "__main__":
+	tornado.options.parse_config_file("./server.conf")
 	tornado.options.parse_command_line()
 	app = tornado.web.Application(handlers)
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(options.port)
-	tornado.ioloop.IOLoop.instance().start()
+	myIoLoop =tornado.ioloop.IOLoop.instance()
+	myIoLoop.start()
