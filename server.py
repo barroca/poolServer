@@ -86,7 +86,8 @@ handlers=[ (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': './static'}
             (r'/', IndexHandler) ]
 myVotes = Votes()
 startTime = time.time()
-
+def call_me():
+	print "help me"
 if __name__ == "__main__":
 	tornado.options.parse_config_file("./server.conf")
 	tornado.options.parse_command_line()
@@ -94,4 +95,5 @@ if __name__ == "__main__":
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(options.port)
 	myIoLoop =tornado.ioloop.IOLoop.instance()
+	myIoLoop.add_timeout(time.time()+(10),call_me);
 	myIoLoop.start()
