@@ -69,7 +69,10 @@ We have chosen only one lock because we need to have the total votes consistent 
 	def get2percent(self):
 		return self.getPercent(self.part2,self.total)
 	
-
+class VoteTime:
+	def __init__(self):
+			
+	
 
 class StatisticsHandler(tornado.web.RequestHandler):
 	'''if user get page show default voting page'''
@@ -96,6 +99,8 @@ class IndexHandler(tornado.web.RequestHandler):
 			self.write(part2)
 			self.write(end)
 			self.write(myId)
+			print(total)
+			
 
 
 

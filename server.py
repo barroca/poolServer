@@ -15,7 +15,7 @@ from threading import Lock
 
 from tornado.options import define, options
 define("port", default=8888, help="run on the given port", type=int)
-define("duration", default=100000, help="run server for period of seconds", type=int)
+define("enddate", default=1, help="run server until enddate", type=int)
 define("mainserverurl", default="localhost", help="URL of the main server that sum the votes", type=str)
 define("mainserverport", default=9999, help="Port to connect with the main server", type=int)
 define("updateinterval", default=60, help="Interval, in seconds, which this server should send data to main server", type=int)
@@ -32,7 +32,9 @@ class Votes:
 		self.part1=0
 		self.part2=0
 		self.total=0
+
 		self.running=True
+		
 		'''
 Since we will need to do simple operations, we will use simple-locks. 
 We have chosen only one lock because we need to have the total votes consistent with the sum on part1 and part2.
@@ -78,6 +80,16 @@ We have chosen only one lock because we need to have the total votes consistent 
 	def get2percent(self):
 		return self.getPercent(self.part2,self.total)
 	
+#this class is used to control values that have been sent.
+class Control:
+	def __init__(self):
+		#keep track on values sent to send just delta votes 
+		self.part1Sent=0
+		self.part2Sent=0
+		self.totalSent=0
+		self.lock = Lock()
+
+
 
 
 '''Handle user requests'''
@@ -123,17 +135,26 @@ handlers=[ (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': './static'}
             (r'/', IndexHandler) ]
 #votes count class
 myVotes = Votes()
+myControl = Control()
 #start time of process
 startTime = time.time()
 #Timed out?
 running = True
+
 #myRandom is used to create uniq contact to mainServer, we can use the ip or url as this variable.
 myRandom = random.random()
 def endVoting():
 	myVotes.running=False
 	#get lock to prevent other 
-	myVotes.lock.aquire()
-	sendData(myVotes.getTotal(),myVotes.get1(),myVotes.get2())
+	myVotes.lock.acquire()
+	if sendData(myVotes.getTotal(),myVotes.get1(),myVotes.get2()):
+		print "We have sent our result to the server"
+	else:
+		print "Problem sending data to the server"
+	myVotes.lock.release()
+	print "Ending vote server"
+	tornado.ioloop.IOLoop.instance().stop()
+
 	
 def sendData(total,part1,part2):
 	end = 0
@@ -142,14 +163,35 @@ def sendData(total,part1,part2):
 	params = {"total": total, "part1": part1, "part2": part2, "end": end, "id": myRandom}
 	query = urllib.urlencode(params)
 	url = "http://%s:%d/publish" % (options.mainserverurl, options.mainserverport)
-	f = urllib.urlopen(url, query)
-	contents = f.read()
-	f.close()
-	print contents
+	ret = False
+	try:
+		f = urllib.urlopen(url, query)
+		contents = f.read()
+		f.close()
+		print contents
+		ret = True
+	except IOError:
+		print "Problem sending data"
+		ret = False
+		
+	return ret
 
 def sendPartial():
-	sendData(myVotes.getTotal(),myVotes.get1(),myVotes.get2())
+	myVotes.lock.acquire()
+	totalNow =myVotes.getTotal()
+	part1Now =myVotes.get1()
+	part2Now = myVotes.get2()  
+	myVotes.lock.release()
+	myControl.lock.acquire()
+	#send only votes received on last updateinterval
+	if sendData(totalNow-myControl.totalSent,part1Now-myControl.part1Sent,part2Now-myControl.part2Sent):
+	#store total votes of this interval for next sendPartial
 	
+		myControl.part1Sent=part1Now
+		myControl.part2Sent=part2Now
+		myControl.totalSent=totalNow
+	myControl.lock.release()
+
 if __name__ == "__main__":
 
 	tornado.options.parse_config_file("./server.conf")
@@ -158,6 +200,9 @@ if __name__ == "__main__":
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(options.port)
 	myIoLoop =tornado.ioloop.IOLoop.instance()
-	myIoLoop.add_timeout(startTime+(options.duration),endVoting)
+	myIoLoop.add_timeout(options.enddate,endVoting)
 	tornado.ioloop.PeriodicCallback(sendPartial,(options.updateinterval*1000)).start()
-	myIoLoop.start()
+	if options.enddate > startTime:
+		myIoLoop.start()
+	else:
+		print "End Date of server is lower than starttime, exiting."
