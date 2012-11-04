@@ -88,6 +88,13 @@ class Control:
 		self.part2Sent=0
 		self.totalSent=0
 		self.lock = Lock()
+		self.scheduler = None
+		self.ioLoop = None
+#start time of process
+		self.startTime = time.time()
+#myRandom is used to create uniq contact to mainServer, we can use the ip or url as this variable.
+		self.myRandom = random.random()
+		
 
 
 
@@ -97,7 +104,6 @@ class IndexHandler(tornado.web.RequestHandler):
 	'''if user get page show default voting page'''
 	def get(self):
 		loader = tornado.template.Loader("./templates")
-		print myVotes.running
 		if myVotes.running:
 			self.write(loader.load("index.html").generate(failMessage=""))
 		else:
@@ -136,13 +142,7 @@ handlers=[ (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': './static'}
 #votes count class
 myVotes = Votes()
 myControl = Control()
-#start time of process
-startTime = time.time()
-#Timed out?
-running = True
 
-#myRandom is used to create uniq contact to mainServer, we can use the ip or url as this variable.
-myRandom = random.random()
 def endVoting():
 	myVotes.running=False
 	#get lock to prevent other 
@@ -153,14 +153,15 @@ def endVoting():
 		print "Problem sending data to the server"
 	myVotes.lock.release()
 	print "Ending vote server"
-	tornado.ioloop.IOLoop.instance().stop()
-
+	#tornado.ioloop.IOLoop.instance().stop()
+	myControl.scheduler.stop()
 	
 def sendData(total,part1,part2):
-	end = 0
+	end = 1
 	if myVotes.running:
-		end = 1
-	params = {"total": total, "part1": part1, "part2": part2, "end": end, "id": myRandom}
+		end = 0
+	params = {"total": total, "part1": part1, "part2": part2, "end": end, "id": myControl.myRandom}
+	print params
 	query = urllib.urlencode(params)
 	url = "http://%s:%d/publish" % (options.mainserverurl, options.mainserverport)
 	ret = False
@@ -199,10 +200,11 @@ if __name__ == "__main__":
 	app = tornado.web.Application(handlers)
 	http_server = tornado.httpserver.HTTPServer(app)
 	http_server.listen(options.port)
-	myIoLoop =tornado.ioloop.IOLoop.instance()
-	myIoLoop.add_timeout(options.enddate,endVoting)
-	tornado.ioloop.PeriodicCallback(sendPartial,(options.updateinterval*1000)).start()
-	if options.enddate > startTime:
-		myIoLoop.start()
+	myControl.ioLoop =tornado.ioloop.IOLoop.instance()
+	myControl.ioLoop.add_timeout(options.enddate,endVoting)
+	myControl.scheduler = tornado.ioloop.PeriodicCallback(sendPartial,(options.updateinterval*1000))
+	myControl.scheduler.start()
+	if options.enddate > myControl.startTime:
+		myControl.ioLoop.start()
 	else:
 		print "End Date of server is lower than starttime, exiting."
